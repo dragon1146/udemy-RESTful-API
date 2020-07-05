@@ -1,0 +1,67 @@
+
+
+Test-firt API design
+
+- start your design by create a request in postman
+
+- base on the question you ask yourself when creating the request with postman, you will be able to know what to create when making your endpoint for the API
+
+- for the example in this section we will be managing stores with various items in them
+
+- to create all the API required to interact with the server start by thinking like the user and identify all the request that the user might want to make
+
+- then in postman create these request one by one and save them in the folder within the collection
+
+- just put the information in the URI bar, and select what method the request will be using. do not do anything to the body or other parameters of the request
+
+- when creating a get request to access a particular item you will have to decide whether to access that item by name or by an id
+    -the following will help you decide which one to choode
+        - if the names of the items cannot be duplicated, then you should access the items by name
+
+        - if the names of the items are allowed to be duplicated then you may want to access the items by their id or return a list of all the items with the same name and have the user choose which one they would want to get the information on
+
+- when creating a post request to create a new item, it is ideal to put the name of the item being created in the URL of the request and the properties of that item in the body of the request
+    - the properties of that item will be in json format
+
+    - it will be converted to a python dictionary with the "request.get_json" method in the API
+
+    - to ensure this:
+        - click on the "Header" tab
+        - click on the "key" text
+        - type the following:
+            - "Content-Type"
+        - click on the "value" text
+        - type the following:
+            - "application/json"
+
+    - to create the properties of the item in the post request to sent to the API:
+        - click on the "Body" tab
+        - click on the "raw" radio button
+        - in the text box type the following:
+            - {
+                "price":15.99
+              }
+            - this is a dictionary item representing the properties of the item
+
+- when creating a delete request to remove an item from the list just include the item's name in the URL of the request
+    - remove all the data in the "header" & "body" of the request because it is not needed for a delete request
+
+- when creating a put request to update one of the properties of a specific item:
+    - click on the method list and select "put"
+    - type the following in the URL bar:
+        - "http://127.0.0.1:5000/item/<name>"
+        - the header will be the same as the header for a post request
+        - the body of the request will contain raw data in json format just like the post request but it will contain the key of the property(ies) that needs to be updated alone with its value(s)
+- the put method can be used to create a new item as well
+    - the difference between a post and a put is:
+        - a post will create a new item but cannot update an existing one
+        - a put can create a new item and also update its properties
+
+- so far we have created requests for 2 resorces:
+    - items
+    - item
+
+
+
+
+    
