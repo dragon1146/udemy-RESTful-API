@@ -3,6 +3,29 @@ from flask import Flask
 
 app = Flask(__name__)
 
+# for now the stores and items in the stores will be stored in a list containing nested dictionaries and list
+# at the start of this lesson we will start with 1 store and that store has 1 items with a price
+
+stores = [
+    {
+        'name': 'my wonderful store',
+        'items': [
+            {
+                'name': 'my item', 'price': 15.09
+            }
+        ]
+    }
+] 
+# the "stores" list will contain all the stores that we are monitoring
+
+# each store will be defined within a dictionary with the following keys...
+    #name- this is the name of the store
+    #this key will have a value of a string
+
+    #items- this is a list containing all the items in that particular store
+    # the items will be represented within a dictionary with the following keys
+
+
 #
 # 1- POST /store data: {name:}
 # ...when this endpoint is received it will create a new store with the name for data
