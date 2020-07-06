@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 
 app = Flask(__name__)
@@ -50,18 +50,42 @@ class Item(Resource):
     # it will get the name of the item from the URL and the properties of the item will be in json format in the body of the request
     # once the item and its properties have been added to the list, the API will return the tems and its properties to the requester
     def post(self, name):
+
+        # the method being used will extract the json date from the request and convert it to a python dictionary and save it to the variable "data"
+        # if you are not sure if the request from the client will be in a json format, you can use an switch in the method called 
+            #  "request.get_json(force=True)" 
+            # which will accept any data in the body of the request whether it is in json format or not
+        # this switch will not look in the "Content-Type" header field to see if it is set to "application/json"
+        # this is a posible vulnerability in the code in which it will process whatever data that's in the body even if its not inn json format
+        # another switch you can use to prevent the API from returning an error is 
+            # request.get_json(silent=True)
+        # this will not return an error if the wrong content-type is in the header, but it will return an "null" value
+        data = request.get_json()
         
-        # this is a static way of passing an item and its properties to the API
-        # on a properly written code, the code within "{}" will be extracted from the request body by a method called "request.get_json"
-        item = {'name': name, 'price': 12.00}
+        # this code will extract the price of the item that was sent in the body of the request in json format but was later converted to a python dictionary
+
+        # in "'name': name,", the name without the quotes is a variable that has the value that was passed in the URL of the request
+            # http://127.0.0.1:5000/chair
+        # in this case this request will create a new item called "chair" with one parameter of "price" with its value of "data['price']"
+        item = {'name': name, 'price': data['price']}
         
-        # list method that allows you to append a list item to the end of the existing items
+        # this list method that allows you to append a list item to the end of the existing items
         items.append(item)
         
-        # this is return the items and its properties to the requester and also a return status code of "200" which means that something was created successfully
+        # this is returning the items and its properties to the requester and also a return status code of "200" which means that something was created successfully
         return item, 201
 
 
-api.add_resource(Item, '/item/<string:name>') 
+class Itemlist(Resource):
 
-app.run(port=5000)
+    # this method will return a python dictionary to the requestor with 1 key:value pair
+    # the key to the pair will be the string "items"
+    # the value to that key will be the "items" list which contains dictionaries with each one representing an item
+    def get(self):
+        return {'items':items}
+
+api.add_resource(Item, '/item/<string:name>')
+api.add_resource(Itemlist, '/items')
+
+# debug=True will allow the source of the API to be updated and synced without restarting the API
+app.run(port=5000, debug=True)
