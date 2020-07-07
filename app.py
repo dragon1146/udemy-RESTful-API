@@ -40,6 +40,21 @@ class Item(Resource):
         # if the name in the URL matches the name of an item in the list, then that item will be returned with its name and properties
         # if the item is not in the items list, it will return a 404 return status code and a null string will be displayed
     def get(self, name):
+        # the line of code below can be used instead of the "for
+        # loop" and the "if" conditional statement
+        # both methods goes thru the item in items and find a match
+        # to an item that matches the name in the URL for the request
+        # the method will still return a python dictionary of the
+        # item
+        # if an item is not in the items list, the API will return a
+        # 404 error
+            # item = next(filter(lambda x: x['name'] == name, items),
+            # None)
+                # return {'item': item}, 200 if item else 404
+
+            
+
+          
         for item in items:
             if item['name'] == name:
                 return item
@@ -59,7 +74,12 @@ class Item(Resource):
         # this is a posible vulnerability in the code in which it will process whatever data that's in the body even if its not inn json format
         # another switch you can use to prevent the API from returning an error is 
             # request.get_json(silent=True)
-        # this will not return an error if the wrong content-type is in the header, but it will return an "null" value
+        # this will not return an error if the wrong content-type is
+        # in the header, but it will return an "null" value
+            # item = next(filter(lambda x: x['name'] == name, items),
+            # None)
+        # return {'message': "an item with the name{} already
+        # exist.".format(name)}, 400 
         data = request.get_json()
         
         # this code will extract the price of the item that was sent in the body of the request in json format but was later converted to a python dictionary
@@ -88,4 +108,4 @@ api.add_resource(Item, '/item/<string:name>')
 api.add_resource(Itemlist, '/items')
 
 # debug=True will allow the source of the API to be updated and synced without restarting the API
-app.run(port=5000, debug=True)
+app.run(port=5000, debug=True, host = '0.0.0.0')

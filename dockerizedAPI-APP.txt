@@ -1,0 +1,31 @@
+
+
+
+this is a continuation of the notes that was started in notebook
+
+
+- when the image is ran, it exited right away - this is because the container must be ran up
+with a process running in the background of the ubuntu image
+
+- i created a new image from a python3 base image with the following
+int in its Dockerfile
+    FROM python:3
+    WORKDIR /app
+    COPY ./requirements.txt .
+    RUN pip3 install --no-cache-dir -r requirements.txt
+    COPY . /app
+    CMD [ "python3", "/app/app.py" ]
+
+- to allow the API to be reach insid the container, the app.run
+parameters needed to be changed to the following
+    - app.run(port=5000, debug=True, host = '0.0.0.0')
+
+- to run the container i executed the following command
+    - docker run -it --name glitch00 -p 8000:5000 glitch-img:latest 
+        - this will give the container a custom name of "glitch00"
+        - it will map port 8000 on the host physical interface to
+        port 5000 on the container
+            - any other host that sends a request to the host's
+            physical interface on port 8000 (192.168.0.78:8000) will
+            be redirecting to the container on port 5000
+
