@@ -1,8 +1,15 @@
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
+from flask_jwt import JWT, jwt_required
+
+from security import authenticate, identity
 
 app = Flask(__name__)
 api = Api(app)
+app.secret_key = 'jose'
+
+jwt = JWT(app, authenticate, identity)
+
 
 items = []
 class Item(Resource):
@@ -38,7 +45,9 @@ class Item(Resource):
                     # this will return a value of "null" and a "404" return status code
         
         # if the name in the URL matches the name of an item in the list, then that item will be returned with its name and properties
-        # if the item is not in the items list, it will return a 404 return status code and a null string will be displayed
+        # if the item is not in the items list, it will return a 404
+        # return status code and a null string will be displayed
+    @jwt_required()
     def get(self, name):
         # the line of code below can be used instead of the "for
         # loop" and the "if" conditional statement
@@ -94,6 +103,11 @@ class Item(Resource):
         
         # this is returning the items and its properties to the requester and also a return status code of "200" which means that something was created successfully
         return item, 201
+
+    def delete(self, name):
+        global items
+        items = list(filter(lambda x: x['name'] != name, items))
+        return {'message': 'Item deleted'}
 
 
 class Itemlist(Resource):
