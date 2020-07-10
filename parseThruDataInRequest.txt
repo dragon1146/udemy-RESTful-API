@@ -1,0 +1,41 @@
+- this is to prevent the changing of the item's name when we are
+updating the price of the item with the "update" method
+
+- to prevent this we are going to ensure that only some elements of
+the item's property gets passes into the request
+
+- the class you will use if 
+    - reqparse
+
+- you create a parser object which has many methods
+    - parer = reqparse.RequestParser()
+
+- one of the methods you will use is
+    -  parser.add_argument()
+
+- you will pass many arguments into this method to define what data
+is required in the body of the request, and also what data will be
+passed onto the API for futher processing
+
+- in this API we will use the RequestParser to do the following:
+    - focus on the item property called "price"
+    - ensure that the value for that key is a "float"
+    - ensure that there is always a value passed for the "price" key
+    - if the request is sent without a value for that key, the
+    following message is returned to the RequestParser
+        - "this field requires a value"
+    
+- the code to do this is 
+    - paser.add_argument("price", type=float, required=True,
+    help="this field requires a value")
+    
+- this code also ensures that if the name of the item was passed in
+the request along with the updated price of the item, only the price
+of the item will will be passed onto the API; the value for the key
+"name" will be discarded by the "parser.add_argument" method
+
+- once the parser object is done going thru the data int he json
+body, it will assign the valid data to the variable "data"
+    - data = parser.parse_args()
+
+then the value of the variabel "data" can now be used thru-out the API

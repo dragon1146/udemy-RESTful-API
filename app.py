@@ -9,6 +9,24 @@ api = Api(app)
 app.secret_key = 'jose'
 
 jwt = JWT(app, authenticate, identity)
+"""the jwt function will be created from the JWT class and it will take 3 arguments
+    - the entire app
+    - the "authenticate" function in the security.py file
+    - the "identity" function in the security.py file
+    
+    - the explaination for the above functions are found in
+        the "security.py" file
+
+the jwt object will be used to do the following:
+    - authenticate the user with the "authenticate" functioin
+    - verify if the user that is sending a request has already
+        been authenticated by using the "identity" function
+
+    - the explaination for the above functions are found in
+            the "security.py" file
+
+
+"""
 
 
 items = []
@@ -48,6 +66,14 @@ class Item(Resource):
         # if the item is not in the items list, it will return a 404
         # return status code and a null string will be displayed
     @jwt_required()
+    """
+    - this is a jwt decorator that will be called everytime this "get"
+    function is called to get info for the requester
+    
+    - when the "get" fucntion is called the decorator will ensure
+      that the request from the requester is sent with a "jwt" token 
+
+    """
     def get(self, name):
         # the line of code below can be used instead of the "for
         # loop" and the "if" conditional statement
@@ -57,52 +83,69 @@ class Item(Resource):
         # item
         # if an item is not in the items list, the API will return a
         # 404 error
-            # item = next(filter(lambda x: x['name'] == name, items),
-            # None)
-                # return {'item': item}, 200 if item else 404
+        """  # item = next(filter(lambda x: x['name'] == name, items),
+        # None)
+            # return {'item': item}, 200 if item else 404 """
 
-            
+        
 
-          
+        
         for item in items:
             if item['name'] == name:
                 return item
         return {'item':None}, 404
 
     
-    # this method with append an item with its properties to the items list
-    # it will get the name of the item from the URL and the properties of the item will be in json format in the body of the request
-    # once the item and its properties have been added to the list, the API will return the tems and its properties to the requester
+    
     def post(self, name):
+        """ 
+        - this method with append an item with its properties to the
+        items list it will get the name of the item from the URL and
+        the properties of the item will be in json format in the body of the request
+        
+        - once the item and its properties have been added to the list, the API will return the tems and its properties to the requester
+        """
 
-        # the method being used will extract the json date from the request and convert it to a python dictionary and save it to the variable "data"
-        # if you are not sure if the request from the client will be in a json format, you can use an switch in the method called 
-            #  "request.get_json(force=True)" 
-            # which will accept any data in the body of the request whether it is in json format or not
-        # this switch will not look in the "Content-Type" header field to see if it is set to "application/json"
-        # this is a posible vulnerability in the code in which it will process whatever data that's in the body even if its not inn json format
-        # another switch you can use to prevent the API from returning an error is 
-            # request.get_json(silent=True)
-        # this will not return an error if the wrong content-type is
-        # in the header, but it will return an "null" value
-            # item = next(filter(lambda x: x['name'] == name, items),
-            # None)
-        # return {'message': "an item with the name{} already
-        # exist.".format(name)}, 400 
+        
         data = request.get_json()
+        """
+        - the method being used will extract the json date from the request and convert it to a python dictionary and save it to the variable "data"
+        - if you are not sure if the request from the client will be in a json format, you can use an switch in the method called 
+             "request.get_json(force=True)" 
+            which will accept any data in the body of the request whether it is in json format or not
+        - this switch will not look in the "Content-Type" header field to see if it is set to "application/json"
+        - this is a posible vulnerability in the code because it will process whatever data that's in the body even if its not inn json format
+        - another switch you can use to prevent the API from returning an error is 
+            "request.get_json(silent=True)"
+        - this will not return an error if the wrong content-type is in the header, but it will return an "null" value
+            item = next(filter(lambda x: x['name'] == name, items),
+            None)
+        return {'message': "an item with the name{} already
+        exist.".format(name)}, 400 
+        """
         
-        # this code will extract the price of the item that was sent in the body of the request in json format but was later converted to a python dictionary
-
-        # in "'name': name,", the name without the quotes is a variable that has the value that was passed in the URL of the request
-            # http://127.0.0.1:5000/chair
-        # in this case this request will create a new item called "chair" with one parameter of "price" with its value of "data['price']"
+       
         item = {'name': name, 'price': data['price']}
+        """
+         this code will extract the price of the item that was sent in the body of the request in json format but was later converted to a python dictionary
+
+        in ('name': name,), the name without the quotes is a variable that has the value that was passed in the URL of the request
+            "http://127.0.0.1:5000/chair"
+        in this case this request will create a new item called "chair" with one parameter of "price" with its value of "data['price']"
+        """
         
-        # this list method that allows you to append a list item to the end of the existing items
+        
         items.append(item)
+        """
+        this list method that allows you to append a list item to the end of the existing items
+        """
         
-        # this is returning the items and its properties to the requester and also a return status code of "200" which means that something was created successfully
         return item, 201
+        """
+        this is returning the items and its properties to the
+        requester and also a return status code of "200" which means
+        that something was created successfully
+        """
 
     def delete(self, name):
         global items
