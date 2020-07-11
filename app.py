@@ -65,8 +65,15 @@ class Item(Resource):
         # if the name in the URL matches the name of an item in the list, then that item will be returned with its name and properties
         # if the item is not in the items list, it will return a 404
         # return status code and a null string will be displayed
-    @jwt_required()
+    
+    parser = reqparse.RequestParser()
+    parser.add_argument('price',
+        type=float,
+        required=True,
+        help="this field cannot be left blank"
+    )
 
+    # @jwt_required()
     def get(self, name):
         # the line of code below can be used instead of the "for
         # loop" and the "if" conditional statement
@@ -100,7 +107,7 @@ class Item(Resource):
         """
 
         
-        data = request.get_json()
+        data = Item.parser.parse_args()
         """
         - the method being used will extract the json date from the request and convert it to a python dictionary and save it to the variable "data"
         - if you are not sure if the request from the client will be in a json format, you can use an switch in the method called 
@@ -144,6 +151,20 @@ class Item(Resource):
         global items
         items = list(filter(lambda x: x['name'] != name, items))
         return {'message': 'Item deleted'}
+
+    def put(self, name):
+       
+        data = Item.parser.parse_args()
+        item = next(filter(lambda x: x['name'] == name, items), None)
+        if item is None:
+            item = {'name': name, 'price':data['price']}
+            items.append(item)
+        else:
+            item.update(data)
+
+        return item
+
+    
 
 
 class Itemlist(Resource):
