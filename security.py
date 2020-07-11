@@ -44,10 +44,6 @@ def authenticate(username, password):
     # user = username_table.get(username, None)
     # if user and safe_str_cmp(user.password, password):
 
-
-
-
-
     
     user = username_mapping.get(username, None)
     if user and user.password == password:

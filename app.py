@@ -66,14 +66,7 @@ class Item(Resource):
         # if the item is not in the items list, it will return a 404
         # return status code and a null string will be displayed
     @jwt_required()
-    """
-    - this is a jwt decorator that will be called everytime this "get"
-    function is called to get info for the requester
-    
-    - when the "get" fucntion is called the decorator will ensure
-      that the request from the requester is sent with a "jwt" token 
 
-    """
     def get(self, name):
         # the line of code below can be used instead of the "for
         # loop" and the "if" conditional statement
