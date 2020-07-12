@@ -1,4 +1,5 @@
 import sqlite3
+from flask_restful import Resource, reqparse
 
 
 class User:
@@ -40,5 +41,38 @@ class User:
         
         connection.close()
         return user
+
+
+class UserRegister(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('username',
+        type=str,
+        required=True,
+        help="THIS FILED CANNOT BE BLANK."
+    )
+    parser.add_argument('password',
+        type=str,
+        required=True,
+        help="THIS FILED CANNOT BE BLANK."
+    )
+
+
+
+    def post(self):
+        data = UserRegister.parser.parse_args()
+
+        if User.find_by_username(data['username']):
+            return {"message":" A user with that username already exist"}, 400
+            
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        query = "INSERT INTO users VALUES (NULL, ?, ?)"
+
+        cursor.execute(query, (data['username'], data['password']))
+
+        connection.commit()
+        connection.close()
+        return {"message":"User created successfully"}, 201
 
 

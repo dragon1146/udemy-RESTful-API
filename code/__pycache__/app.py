@@ -4,6 +4,9 @@ from flask_jwt import JWT, jwt_required
 
 from security import authenticate, identity
 
+from user import UserRegister  
+
+
 app = Flask(__name__)
 api = Api(app)
 app.secret_key = 'jose'
@@ -177,6 +180,7 @@ class Itemlist(Resource):
 
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(Itemlist, '/items')
+api.add_resource(UserRegister, '/register')
 
 # debug=True will allow the source of the API to be updated and synced without restarting the API
 app.run(port=5000, debug=True, host = '0.0.0.0')
