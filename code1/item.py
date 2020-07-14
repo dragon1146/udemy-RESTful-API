@@ -54,23 +54,19 @@ class Item(Resource):
         return item, 201
        
     def delete(self, name):
-        # if self.find_by_name(name):
-        #     return {'message':"An item already exist with '{}'".format(name),},400
-       
-        
-       
-        # item = self.find_by_name(name)
+        if self.find_by_name(name):    
+            connection = sqlite3.connect('data.db')
+            cursor = connection.cursor()
 
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
+            query = "DELETE FROM items WHERE name=?"
+            cursor.execute(query, (name,))
 
-        query = "DELETE FROM items WHERE name=?"
-        cursor.execute(query, (name,))
+            connection.commit()
+            connection.close()
 
-        connection.commit()
-        connection.close()
-
-        return {'message':"item was deleted"},200
+            return {'message':"item was deleted"},200
+        else:
+            return {'message':"it was not deleted because it was not present"}, 404
        
 
     def put(self, name):
