@@ -26,12 +26,12 @@ class User:
         return user
 
     @classmethod
-    def find_by_id(cls, username):
+    def find_by_id(cls, id):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
         
 
-        query = "SELETC * FROM users WHERE id=?"
+        query = "SELECT * FROM users WHERE id=?"
         result = cursor.execute(query, (id,))
         row = result.fetchone()
         if row:
