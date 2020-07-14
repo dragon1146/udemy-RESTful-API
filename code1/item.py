@@ -55,13 +55,13 @@ class Item(Resource):
         - this 'try & except' python construct will do the following
             - it will try to execute the code within the 'try' block
             - if that code does not return any error then it does not
-              go into the 'execpt' portion of the code
+                go into the 'execpt' portion of the code
             - if there was an error in executing the code in the
-              'try' block, then python will return the message within
-              the 'except' block of code
+                'try' block, then python will return the message within
+                the 'except' block of code
             - that message should be short but detailed enough to
-              tell the programmer where in the body of the code the
-              error happened
+                tell the programmer where in the body of the code the
+                error happened
         """
         return item, 201
 
@@ -75,20 +75,20 @@ class Item(Resource):
 
         connection.commit()
         connection.close()
-        """
-        - this 'classmethod' will be used by the 'post' and 'put'
-        method to insert items or update items in the database
-        
-        - the code could have stayed in the 'post' method but when
-          the 'put' method calls up the 'post' method to insert an
-          item into the database, there will be code that will be
-          executed that is not needed to be executed by the 'put'
-          method
+    """
+    - this 'classmethod' will be used by the 'post' and 'put'
+    method to insert items or update items in the database
 
-        - instead of taking the name of a item as a variable, this
-          method will take an item with its properties
-        
-        """
+    - the code could have stayed in the 'post' method but when
+        the 'put' method calls up the 'post' method to insert an
+        item into the database, there will be code that will be
+        executed that is not needed to be executed by the 'put'
+        method
+
+    - instead of taking the name of a item as a variable, this
+        method will take an item with its properties
+
+    """
        
     def delete(self, name):
         if self.find_by_name(name):    
@@ -109,14 +109,74 @@ class Item(Resource):
     def put(self, name):
        
         data = Item.parser.parse_args()
-        item = next(filter(lambda x: x['name'] == name, items), None)
-        if item is None:
-            item = {'name': name, 'price':data['price']}
-            items.append(item)
-        else:
-            item.update(data)
+        item = self.find_by_name(name)
+        """
+        this code is searching for the item in the database to see if
+        it exist
 
-        return item
+        if it exist, then the 'self.update()' method will be executed
+        with the values from the 'updated_item' dictionary
+
+        if the item does not exist, then the 'self.insert()' method
+        will be used to insert the item in the database with the
+        values from the 'update_item()' dictionary
+        """  
+        updated_item = {'name':name, 'price':data['price']}
+
+
+        if item is None:
+            try:
+                self.insert(updated_item)
+                """
+                this code will run if the item was not found in the
+                database
+
+                it will insert the item in the database with the
+                values from the 'update_item()' dictionary
+                """
+            except:
+                return {'message':"an error occurred when inserting that new item"}, 500
+        else:
+            try:
+                self.update(updated_item)
+                """
+                this code will run if the item was found in the
+                database
+
+                it will update the item in the database with the
+                values from the 'update_item()' dictionary
+                """
+            except:
+                return {'message':"an error occurred when updating that new item"}, 500
+        return updated_item
+    
+
+    @classmethod
+    def update(cls, item):
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        query = "UPDATE items SET price=? WHERE name=?"
+        """
+        - this SQL command will update the items table and set the
+            price column value to the updated price where the name of
+            the item in the row is equal to the variable 'name'
+        """
+        
+        
+        cursor.execute(query, (item['price'], item['name']))
+        """
+        - the order in which we sent the values for the name and price
+        of the item is defferent from anywhere else in the code
+
+        - this is because in the variable 'query' the value of price
+            comes before the value of the name of the item
+
+        - so we must follow the order in which SQL command will be executed
+        """
+
+        connection.commit()
+        connection.close()
 
     
 
