@@ -187,4 +187,15 @@ class Itemlist(Resource):
     # the key to the pair will be the string "items"
     # the value to that key will be the "items" list which contains dictionaries with each one representing an item
     def get(self):
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        query = "SELECT * FROM items"
+        result = cursor.execute(query)
+        items = []
+        for row in result:
+            items.append({'name':row[0], 'price':row[1]})
+        
+        connection.close()
+
         return {'items':items}
