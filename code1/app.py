@@ -39,4 +39,5 @@ api.add_resource(Itemlist, '/items')
 api.add_resource(UserRegister, '/register')
 
 # debug=True will allow the source of the API to be updated and synced without restarting the API
-app.run(port=5000, debug=True, host = '0.0.0.0')
+if __name__=='__main__':
+    app.run(port=5000, debug=True, host = '0.0.0.0')

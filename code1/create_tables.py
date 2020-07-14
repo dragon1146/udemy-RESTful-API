@@ -13,7 +13,7 @@ cursor.execute(create_table)
 
 # item = ('test', '12.89')
 # insert_query = 
-cursor.execute("INSERT INTO items VALUES ('test', 10.99)")
+# cursor.execute("INSERT INTO items VALUES ('test', 10.99)")
 
 
 connection.commit()

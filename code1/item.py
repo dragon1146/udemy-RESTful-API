@@ -14,8 +14,15 @@ class Item(Resource):
         help="this field cannot be left blank"
     )
 
-    @jwt_required()
+    # @jwt_required()
     def get(self, name):
+        item = self.find_by_name(name)
+        if item:
+            return item
+        return {'message':"Item not found"}, 404 
+    
+    @classmethod
+    def find_by_name(cls, name):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
@@ -26,70 +33,45 @@ class Item(Resource):
 
         if row:
             return {'item':{'name':row[0], 'price':row[1]}}
-        return {'message':"Item not found"}, 404
-
-        
-
-
-
-
-
-    
     
     def post(self, name):
-        """ 
-        - this method with append an item with its properties to the
-        items list it will get the name of the item from the URL and
-        the properties of the item will be in json format in the body of the request
-        
-        - once the item and its properties have been added to the list, the API will return the tems and its properties to the requester
-        """
-
-        
+        if self.find_by_name(name):
+            return {'message':"An item already exist with '{}'".format(name),},400
+       
         data = Item.parser.parse_args()
-        """
-        - the method being used will extract the json date from the request and convert it to a python dictionary and save it to the variable "data"
-        - if you are not sure if the request from the client will be in a json format, you can use an switch in the method called 
-             "request.get_json(force=True)" 
-            which will accept any data in the body of the request whether it is in json format or not
-        - this switch will not look in the "Content-Type" header field to see if it is set to "application/json"
-        - this is a posible vulnerability in the code because it will process whatever data that's in the body even if its not inn json format
-        - another switch you can use to prevent the API from returning an error is 
-            "request.get_json(silent=True)"
-        - this will not return an error if the wrong content-type is in the header, but it will return an "null" value
-            item = next(filter(lambda x: x['name'] == name, items),
-            None)
-        return {'message': "an item with the name{} already
-        exist.".format(name)}, 400 
-        """
-        
        
         item = {'name': name, 'price': data['price']}
-        """
-         this code will extract the price of the item that was sent in the body of the request in json format but was later converted to a python dictionary
 
-        in ('name': name,), the name without the quotes is a variable that has the value that was passed in the URL of the request
-            "http://127.0.0.1:5000/chair"
-        in this case this request will create a new item called "chair" with one parameter of "price" with its value of "data['price']"
-        """
-        
-        
-        items.append(item)
-        """
-        this list method that allows you to append a list item to the end of the existing items
-        """
-        
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        query = "INSERT INTO items VALUES (?,?)"
+        cursor.execute(query, (item['name'], item['price']))
+
+        connection.commit()
+        connection.close()
+
         return item, 201
-        """
-        this is returning the items and its properties to the
-        requester and also a return status code of "200" which means
-        that something was created successfully
-        """
-
+       
     def delete(self, name):
-        global items
-        items = list(filter(lambda x: x['name'] != name, items))
-        return {'message': 'Item deleted'}
+        # if self.find_by_name(name):
+        #     return {'message':"An item already exist with '{}'".format(name),},400
+       
+        
+       
+        # item = self.find_by_name(name)
+
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        query = "DELETE FROM items WHERE name=?"
+        cursor.execute(query, (name,))
+
+        connection.commit()
+        connection.close()
+
+        return {'message':"item was deleted"},200
+       
 
     def put(self, name):
        
