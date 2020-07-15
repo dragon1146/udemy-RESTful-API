@@ -2,6 +2,9 @@ import sqlite3
 from flask_restful import Resource, reqparse
 from flask_jwt import JWT, jwt_required
 
+from models.item import ItemModel
+
+
 
 
 
@@ -17,37 +20,24 @@ class Item(Resource):
     # @jwt_required()
     def get(self, name):
         try:
-            item = self.find_by_name(name)
+            item = ItemModel.find_by_name(name)
         except:
             return {'message':"there was a problem with SQL while retrieving the item."}, 500
         
         if item:
-            return item
+            return item.json()
         return {'message':"Item not found"}, 404 
     
-    @classmethod
-    def find_by_name(cls, name):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
-        query = "SELECT * FROM items WHERE name=?"
-        result = cursor.execute(query, (name,))
-        row = result.fetchone()
-        connection.close()
-
-        if row:
-            return {'item':{'name':row[0], 'price':row[1]}}
-    
     def post(self, name):
-        if self.find_by_name(name):
+        if ItemModel.find_by_name(name):
             return {'message':"An item already exist with '{}'".format(name),},400
        
         data = Item.parser.parse_args()
-        item = {'name': name, 'price': data['price']}
+        item = ItemModel(name, data['price'])
         
 
         try:
-            self.insert(item)
+            item.insert()
         except:
             return {'message':"an error occurred when inserting that new item"}, 500
         
@@ -65,33 +55,9 @@ class Item(Resource):
         """
         return item, 201
 
-    @classmethod
-    def insert(cls, item):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
-        query = "INSERT INTO items VALUES (?,?)"
-        cursor.execute(query, (item['name'], item['price']))
-
-        connection.commit()
-        connection.close()
-    """
-    - this 'classmethod' will be used by the 'post' and 'put'
-    method to insert items or update items in the database
-
-    - the code could have stayed in the 'post' method but when
-        the 'put' method calls up the 'post' method to insert an
-        item into the database, there will be code that will be
-        executed that is not needed to be executed by the 'put'
-        method
-
-    - instead of taking the name of a item as a variable, this
-        method will take an item with its properties
-
-    """
-       
+  
     def delete(self, name):
-        if self.find_by_name(name):    
+        if ItemModel.find_by_name(name):    
             connection = sqlite3.connect('data.db')
             cursor = connection.cursor()
 
@@ -109,7 +75,7 @@ class Item(Resource):
     def put(self, name):
        
         data = Item.parser.parse_args()
-        item = self.find_by_name(name)
+        item = ItemModel.find_by_name(name)
         """
         this code is searching for the item in the database to see if
         it exist
@@ -121,12 +87,12 @@ class Item(Resource):
         will be used to insert the item in the database with the
         values from the 'update_item()' dictionary
         """  
-        updated_item = {'name':name, 'price':data['price']}
+        updated_item = ItemModel(name, data['price'])
 
 
         if item is None:
             try:
-                self.insert(updated_item)
+                ItemModel.insert(updated_item)
                 """
                 this code will run if the item was not found in the
                 database
@@ -138,7 +104,7 @@ class Item(Resource):
                 return {'message':"an error occurred when inserting that new item"}, 500
         else:
             try:
-                self.update(updated_item)
+                ItemModel.update(updated_item)
                 """
                 this code will run if the item was found in the
                 database
@@ -150,33 +116,6 @@ class Item(Resource):
                 return {'message':"an error occurred when updating that new item"}, 500
         return updated_item
     
-
-    @classmethod
-    def update(cls, item):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
-        query = "UPDATE items SET price=? WHERE name=?"
-        """
-        - this SQL command will update the items table and set the
-            price column value to the updated price where the name of
-            the item in the row is equal to the variable 'name'
-        """
-        
-        
-        cursor.execute(query, (item['price'], item['name']))
-        """
-        - the order in which we sent the values for the name and price
-        of the item is defferent from anywhere else in the code
-
-        - this is because in the variable 'query' the value of price
-            comes before the value of the name of the item
-
-        - so we must follow the order in which SQL command will be executed
-        """
-
-        connection.commit()
-        connection.close()
 
     
 
