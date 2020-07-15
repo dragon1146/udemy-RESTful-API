@@ -1,5 +1,5 @@
  
-from user import User
+from resources.user import User
 
 
 
